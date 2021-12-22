@@ -142,8 +142,8 @@
    - name: ce
      tags: debug3
      debug:
-       msg: "{{ item.0.name }}"
-       #msg:  "{{ item.1.subnets.name}}" # returns three ip names , that's it
+       #msg: "{{ item.0.name }}"
+       msg:  "{{ item.1.subnets.name}}" # returns three ip names , that's it
        #msg: "{{ item.1.vrf }}"
      with_subelements: 
        - "{{ tenants }}"
@@ -155,7 +155,7 @@
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
-       msg: "{{ item.0.application_profiles.0.epgs.0.name}}"   # this returns one name 
+       msg: "{{ item.1.epgs}}"   # this returns one name 
      with_subelements: 
        - "{{ tenants }}"
        - "application_profiles"       # Repeated ones coz there is only ap list 
