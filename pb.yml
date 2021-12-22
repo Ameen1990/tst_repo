@@ -41,7 +41,7 @@
          validate_certs: false
      
    - name: Create a tenant
-     tags: always
+     tags: tenant
      aci_tenant:
        tenant: "{{ item.name }}"
        description: "{{ item.description }}"
