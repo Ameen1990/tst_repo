@@ -150,12 +150,12 @@
        - "bridge_domains"
 
 
-# repeated three times, coz epgs lies under application_profiles,
+# Repeated three times, coz epgs lies under application_profiles,
 # There is only ap list
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
-       msg: "{{ item.0.application_profiles.0.epgs[].name}}"   # this returns one name 
+       msg: "{{ item.0.application_profiles.0.epgs.0.name}}"   # this returns one name 
      with_subelements: 
        - "{{ tenants }}"
        - "bridge_domains"       # Repeated ones coz there is only ap list 
