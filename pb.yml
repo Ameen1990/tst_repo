@@ -111,3 +111,17 @@
      with_subelements: 
        - "{{ tenants }}"
        - "application_profiles"
+
+
+
+
+
+   - name: Create three Bridge-Domains
+     tags: debug, bds
+     debug:
+       #msg: "{{ item.0.name }}"
+       msg: "{{ item.1.name }}"
+       #msg: "{{ item.1.vrf }}"
+     with_subelements: 
+       - "{{ tenants }}"
+       - "bridge_domains"
