@@ -101,13 +101,14 @@
 
 
 # epgs is subnested list, it hast epg name, bd name then contracts list inside as well. 
+   
    - name: Create EPG_Web_Server
      tags: epg
      aci_epg:
-       tenant: "{{ item.0.name }}"       # this returns one name
-       ap: "{{ item.1.name }}"           # this returns one name
-       epg: "{{ item.1.epgs.0.name }}"   # this returns one name, coz epgs.name didnt work
-       bd: "{{ item.1.epgs.0.bd }}"      # this returns one name 
+       tenant: "{{ item.0.name }}"
+       ap: "{{ item.1.name }}"
+       epg: "{{ item.1.epgs.0.name }}" # This returns one name, application_profiles has one list called epgs thats why it won't be iterated upon, and epgs.0 must be specified
+       bd: "{{ item.1.epgs.0.bd }}"    
        <<: *cred
      with_subelements: 
        - "{{ tenants }}"
@@ -131,7 +132,7 @@
      tags: debug2
      debug:
        #msg: "{{ item.0.name }}"
-       msg: "{{ item.1.subnets }}"
+       msg: "{{ item.1.subnets }}" # returns the content of subnets dictonary 
        #msg: "{{ item.1.vrf }}"
      with_subelements: 
        - "{{ tenants }}"
@@ -155,8 +156,24 @@
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
-       msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs
-     with_subelements: 
+       msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs that's why it wont be iterated upon, and epgs.0 must be specified
+     with_subelements:           # to iterte over dictionaries, the output has to be list of dictionaries 
        - "{{ tenants }}"
        - "application_profiles"       # Repeated ones coz there is only ap list 
 
+# Repeated three times, coz epgs lies under application_profiles,
+# There is only ap list
+   - name: Create EPG_Web_Server
+     tags: debug4
+     debug:
+       msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs that's why it wont be iterated upon, and epgs.0 must be specified
+     with_subelements:           # to iterte over dictionaries, the output has to be list of dictionaries 
+       - "{{ tenants }}"
+       - "application_profiles"       # Repeated ones coz there is only ap list 
+
+
+   - name: Create EPG_Web_Server
+     tags: debug5
+     debug:
+       msg: "{{ item.1.epgs}}"   
+     loop: "{{ tenants  | json_query('application_profiles.epgs') }}"
