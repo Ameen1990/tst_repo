@@ -153,7 +153,7 @@
 
    - name: Create EPG_Web_Server
      tags: debug4
-     aci_epg:
+     debug:
        #msg: "{{ item.0.name }}"       # this returns one name
        #msg: "{{ item.1.name }}"           # this returns one name
        msg: "{{ item.1.epgs.0.name }}"   # this returns one name 
