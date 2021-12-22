@@ -157,7 +157,7 @@
      debug:
        #msg: "{{ item.0.name }}"       # this returns one name
        #msg: "{{ item.1.name }}"           # this returns one name
-       msg: "{{ item.1.epgs.name }}"   # this returns one name 
+       msg: "{{ item.1.epgs.0.name }}"   # this returns one name 
        #msg: "{{ item.1.epgs.0.bd }}"      # this returns one name 
      with_subelements: 
        - "{{ tenants }}"
