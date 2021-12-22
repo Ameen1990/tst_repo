@@ -89,7 +89,7 @@
      tags: subs
      aci_bd_subnet:
        tenant: "{{ item.0.name }}"
-       name: "{{ item.1.subnets.0.name }}"          # this returns three names 
+       name: "{{ item.1.subnets.0.name }}"          # this returns three names , coz brifg_domains has three different lists called "subnets"
        bd: "{{ item.1.name }}"                      # this returns three names 
        gateway_ip: "{{ item.1.subnets.0.name }}"    # this returns three names
        subnet_mask: "{{ item.1.subnets.0.mask }}"   # this returns three names
@@ -106,7 +106,7 @@
      aci_epg:
        tenant: "{{ item.0.name }}"       # this returns one name
        ap: "{{ item.1.name }}"           # this returns one name
-       epg: "{{ item.1.epgs.0.name }}"   # this returns one name 
+       epg: "{{ item.1.epgs.0.name }}"   # this returns one name, coz epgs.name didnt work
        bd: "{{ item.1.epgs.0.bd }}"      # this returns one name 
        <<: *cred
      with_subelements: 
@@ -155,7 +155,7 @@
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
-       msg: "{{ item.1.epgs.name}}"   # this returns one name 
+       msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs
      with_subelements: 
        - "{{ tenants }}"
        - "application_profiles"       # Repeated ones coz there is only ap list 
