@@ -1,0 +1,125 @@
+---
+-  hosts: apic
+   any_errors_fatal: true
+   gather_facts: no
+
+   vars:
+     ansible_connection: local
+     ansible_python_interpreter: /usr/bin/python3
+    
+   vars_prompt:
+     - name: "apic_ip"
+       prompt: "Enter APIC IP"
+       default: 'sandboxapicdc.cisco.com'
+       private: no
+
+     - name: "user"
+       prompt: "Enter your APIC Username"
+       default: 'admin'
+       unsafe: yes
+
+     - name: "pass"
+       prompt: "Enter your APIC Password"
+       default: '!v3G@!4@Y'
+       private: yes
+       unsafe: yes
+
+
+   tasks:
+   - name: Display the JSON file content
+     shell: cat /root/ACI_Objects_Creator/files/source.json
+     register: result
+
+   - name: save the Json data to a Variable as a Fact
+     set_fact:
+       jsondata: "{{ result.stdout | from_json }}"
+
+   - name: Print to see how it looks like
+     debug:
+       var: jsondata 
+
+
+#   - name: Display all cluster names
+#     debug:
+#       var: item.name
+#     loop: "{{ jsondata  | json_query('tenants[*]') }}"
+
+
+   - name: Create a tenant
+     aci_tenant:
+       tenant: "{{ item.name }}"
+       description: "{{ item.description }}"
+       host: "{{ inventory_hostname }}"
+       username: "{{ user }}"
+       password: "{{ pass }}"
+       validate_certs: false
+     loop: "{{ jsondata  | json_query('tenants[*]') }}"
+#     with_items:  "{{  }}"
+
+
+   - name: Create ap
+     aci_ap:
+       name: "{{ item.name }}"
+       description: "{{ item.description }}"
+       tenant: TN_Prod # "{{ jsondata | json_query(\"tenants.name\") }}"
+       host: "{{ inventory_hostname }}"
+       username: "{{ user }}"
+       password: "{{ pass }}"
+       validate_certs: false
+     loop: "{{ jsondata | json_query('tenants[*].application_profiles[]') }}"
+
+
+
+# output: -
+
+# ok: [{{ apic_ip }}] => (item=[{u'name': u'datacenter'}]) => {
+#    "ansible_loop_var": "item",
+#    "item": [
+#        {
+#            "name": "datacenter"
+#        }
+#    ]
+#}
+
+
+#   - name: Display all cluster names
+#     debug:
+#      var: item.name
+#     loop: "{{ jsondata  | json_query('tenants[*].vrfs') }}"
+
+
+#ok: [{{ apic_ip }}] => (item=[{u'name': u'datacenter'}]) => {
+#    "ansible_loop_var": "item",
+#    "item": [
+#        {
+#            "name": "datacenter"
+#        }
+#    ],
+#    "item.name": "VARIABLE IS NOT DEFINED!"
+#}
+
+
+    
+# output: -
+
+# ok: [{{ apic_ip }}] => (item=[{u'name': u'datacenter'}]) => {
+#    "ansible_loop_var": "item",
+#    "item": [
+#        {
+#            "name": "datacenter"
+#        }
+#    ]
+#}
+
+
+
+#   - name: Display 
+#     debug:
+#       var: "{{ jsondata  | json_query('tenants[*].vrfs.name') }}"
+
+   
+
+#   - name: Display 
+#     debug:
+#       var: item.name
+#     loop: "{{ jsondata  | json_query('tenants.vrfs[*].name') }}"
