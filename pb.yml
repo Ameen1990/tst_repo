@@ -156,7 +156,7 @@
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
-       msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs that's why it wont be iterated upon, and epgs.0 must be specified
+       msg: "{{ item.1.epgs.bd}}"   # This returns one name, application_profiles has one list called epgs that's why it wont be iterated upon, and epgs.0 must be specified
      with_subelements:           # to iterte over dictionaries, the output has to be list of dictionaries 
        - "{{ tenants }}"
        - "application_profiles"       # Repeated ones coz there is only ap list 
@@ -164,7 +164,7 @@
 # Repeated three times, coz epgs lies under application_profiles,
 # There is only ap list
    - name: Create EPG_Web_Server
-     tags: debug4
+     tags: debug5
      debug:
        msg: "{{ item.1.epgs}}"   # This returns one name, application_profiles has one list called epgs that's why it wont be iterated upon, and epgs.0 must be specified
      with_subelements:           # to iterte over dictionaries, the output has to be list of dictionaries 
