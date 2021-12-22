@@ -142,12 +142,12 @@
    - name: ce
      tags: debug3
      debug:
-       #msg: "{{ item.0.name }}"
-       msg:  "{{ item.1.subnets}}" # returns three ip names , that's it
+       msg: "{{ item.0.name }}"
+       #msg:  "{{ item.1.subnets}}" # returns three ip names , that's it
        #msg: "{{ item.1.vrf }}"
      with_subelements: 
        - "{{ tenants }}"
-       - "bridge_domains"
+       - "bridge_domains.subnets"
 
 
 
