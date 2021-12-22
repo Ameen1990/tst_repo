@@ -159,7 +159,7 @@
        #msg: "{{ item.1.name }}"           # this returns one name
        msg: "{{ item.0.application_profiles.epgs}}"   # this returns one name 
        #msg: "{{ item.1.epgs.0.bd }}"      # this returns one name 
-     with_items: 
+     with_subelements: 
        - "{{ tenants }}"
-       - "bridge_domains"          # Repeated ones coz there is only ap list 
+       - "bridge_domains"       # Repeated ones coz there is only ap list 
 
