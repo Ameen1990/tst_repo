@@ -176,4 +176,4 @@
      tags: debug5
      debug:
        msg: "{{ item.1.epgs}}"   
-     loop: "{{ tenants  | json_query('application_profiles[*].epgs') }}"
+     loop: "{{ tenants  | json_query('tenants [*].application_profiles.epgs') }}"
