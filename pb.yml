@@ -123,12 +123,28 @@
        - "{{ tenants }}"
        - "bridge_domains"
 
+# here i can grab the subnets details such as name, mask and scope for three subnets
 
    - name: Create three Bridge-Domains
      tags: debug2
      debug:
        #msg: "{{ item.0.name }}"
        msg: "{{ item.1.subnets }}"
+       #msg: "{{ item.1.vrf }}"
+     with_subelements: 
+       - "{{ tenants }}"
+       - "bridge_domains"
+
+
+      
+
+
+
+   - name: ce
+     tags: debug3
+     debug:
+       #msg: "{{ item.0.name }}"
+       msg:  "{{ item.1.subnets.0.name }}"
        #msg: "{{ item.1.vrf }}"
      with_subelements: 
        - "{{ tenants }}"
