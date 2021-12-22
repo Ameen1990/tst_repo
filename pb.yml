@@ -158,5 +158,5 @@
        msg: "{{ item.0.application_profiles.0.epgs.0.name}}"   # this returns one name 
      with_subelements: 
        - "{{ tenants }}"
-       - "bridge_domains"       # Repeated ones coz there is only ap list 
+       - "application_profiles"       # Repeated ones coz there is only ap list 
 
