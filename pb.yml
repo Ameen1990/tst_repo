@@ -111,7 +111,7 @@
        <<: *cred
      with_subelements: 
        - "{{ tenants }}"
-       - "application_profiles"          # because 
+       - "application_profiles"          # Repeated ones coz there is only ap Llist  
 
 
    - name: Create three Bridge-Domains
@@ -143,14 +143,15 @@
      tags: debug3
      debug:
        msg: "{{ item.0.name }}"
-       #msg:  "{{ item.1.subnets}}" # returns three ip names , that's it
+       #msg:  "{{ item.1.subnets.name}}" # returns three ip names , that's it
        #msg: "{{ item.1.vrf }}"
      with_subelements: 
        - "{{ tenants }}"
        - "bridge_domains"
 
 
-
+# repeated three times, coz epgs lies under application_profiles,
+# There is only ap list
    - name: Create EPG_Web_Server
      tags: debug4
      debug:
@@ -160,4 +161,6 @@
        #msg: "{{ item.1.epgs.0.bd }}"      # this returns one name 
      with_subelements: 
        - "{{ tenants }}"
-       - "application_profiles"          # because 
+       - "application_profiles"          # Repeated ones coz there is only ap list 
+
+       
