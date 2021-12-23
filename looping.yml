@@ -58,9 +58,9 @@
    - name: Create ap
      tags: debug1
      debug:
-       msg: "{{ item.application_profiles.0.name }}"
+       #msg: "{{ item.application_profiles.0.name }}"
        #msg: "{ item.application_profiles.description }}"
-       #msg: "{{ item.name }}"
+       msg: "{{ item.name }}"
      loop: "{{ jsondata | json_query('tenants[*]') }}"
 
 
