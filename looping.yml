@@ -78,7 +78,7 @@
      tags: bd
      debug: #aci_bd:
        #msg: "{{ item.name }}"  # name
-       msg: "{{ item.name }}"  # bd
+       msg: "{{ item.0.name }}"  # bd
        #msg: "{{ item.vrf.name }}"   # vrf
        #<<: *cred  
      loop: 
