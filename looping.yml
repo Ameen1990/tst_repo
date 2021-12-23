@@ -73,7 +73,7 @@
    - name: create VRF
      tags: vrf
      aci_vrf:
-       vrf: "{{ item.vrfs.name }}"
+       vrf: "{{ item.vrfs.0.name }}"
        tenant: "{{ item.name }}"
        <<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
