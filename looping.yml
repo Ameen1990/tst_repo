@@ -50,10 +50,7 @@
      aci_tenant:
        tenant: "{{ item.name }}"
        description: "{{ item.description }}"
-       host: "{{ inventory_hostname }}"
-       username: "{{ user }}"
-       password: "{{ pass }}"
-       validate_certs: false
+       <<: *cred  
      loop: "{{ jsondata  | json_query('tenants[*]') }}"
 
 
@@ -81,7 +78,7 @@
      tags: bd
      debug: #aci_bd:
        #msg: "{{ item.name }}"  # name
-       msg: "{{ item.bridge_domains.0.name }}"  # bd
+       msg: "{{ item.bridge_domains.0 }}"  # bd
        #msg: "{{ item.vrf.name }}"   # vrf
        #<<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
