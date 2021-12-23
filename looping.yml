@@ -81,7 +81,7 @@
      tags: bd
      debug: #aci_bd:
        #msg: "{{ item.name }}"  # name
-       msg: "{{ item.bridge_domains.name }}"  # bd
+       msg: "{{ item.bridge_domains.0.name }}"  # bd
        #msg: "{{ item.vrf.name }}"   # vrf
        #<<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
