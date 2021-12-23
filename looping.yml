@@ -55,10 +55,10 @@
 
    - name: Create ap
      aci_ap:
-       name: "{{ item.name }}"
-       description: "{ { item.description }}"
-       tenant: "{{ item.0.name }}" # "{{ jsondata | json_query(\"tenants.name\") }}"
-     loop: "{{ jsondata | json_query('tenants[*].application_profiles') }}"
+       name: "{{ item.application_profiles.name }}"
+       description: "{ item.application_profiles.description }}"
+       tenant: "{{ item.name }}"
+     loop: "{{ jsondata | json_query('tenants[*]') }}"
 
 
 
