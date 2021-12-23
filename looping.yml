@@ -54,10 +54,11 @@
 
 
    - name: Create ap
-     aci_ap:
-       name: "{{ item.application_profiles.0.name }}"
-       description: "{ item.application_profiles.description }}"
-       tenant: "{{ item.name }}"
+     tags: debug1
+     debug:
+       msg: "{{ item.application_profiles.0.name }}"
+       #msg: "{ item.application_profiles.description }}"
+       #msg: "{{ item.name }}"
      loop: "{{ jsondata | json_query('tenants[*]') }}"
 
 
