@@ -67,9 +67,6 @@
      loop: "{{ jsondata | json_query('tenants[*]') }}"
 
 
-
-
-
    - name: create VRF
      tags: vrf
      aci_vrf:
@@ -77,6 +74,19 @@
        tenant: "{{ item.name }}"
        <<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
+
+
+
+   - name: Create three Bridge-Domains
+     tags: bd
+     debug: #aci_bd:
+       msg: "{{ item.name }}"  # name
+       #msg: "{{ item.bridge_domains.name }}"  # bd
+       #msg: "{{ item.vrf.name }}"   # vrf
+       #<<: *cred  
+     loop: "{{ jsondata | json_query('tenants[*]') }}"
+
+
 
 
 
