@@ -187,7 +187,7 @@
    - name: Create EPG_Web_Server
      tags: debug7
      debug:
-       msg: "{{ item.1.epgs.0}}"   
+       msg: "{{ item.1.epgs}}"   
      with_subelements:            
        - "{{ tenants }}"
        - "application_profiles"
