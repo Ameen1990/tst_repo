@@ -186,9 +186,9 @@
    - name: debug7
      tags: debug7
      debug:
-       msg: "{{ item.1.epgs}}"   
+       msg: "{{ item.1.name}}"   
      with_subelements:            
        - "{{ tenants }}"
-       - "application_profiles"
+       - "epgs"
 
 
