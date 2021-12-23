@@ -1,0 +1,27 @@
+---
+
+tenants:
+  - name: TN_prod
+    description: "All production related objects"
+    epgs:
+      - name: EPG_webserver
+        bd: BD_webserver
+        contracts:
+          - name: C_internet
+            type: provider
+          - name: C_appserver
+            type: consumer
+      - name: EPG_appserver
+        bd: BD_appserver
+        contracts:
+          - name: C_appserver
+            type: provider
+          - name: C_database
+            type: consumer
+      - name: EPG_database
+        bd: BD_database
+        contracts:
+          - name: C_database
+            type: provider
+    
+    
