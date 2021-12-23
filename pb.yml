@@ -175,6 +175,7 @@
 
    - name: Create three Subnets
      tags: debug6
+     debug:
      #aci_bd_subnet:
        #tenant: "{{ item.0.name }}"
        msg: "{{ item.1.subnets.name }}"          # this returns three names , coz brifg_domains has three different lists called "subnets"
