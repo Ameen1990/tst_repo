@@ -45,12 +45,6 @@
      set_fact:
        jsondata: "{{ result.stdout | from_json }}"
 
-   #- name: Print to see how it looks like
-    # debug:
-     #  var: jsondata 
-
-
-
 
    - name: Create a tenant
      aci_tenant:
@@ -61,7 +55,6 @@
        password: "{{ pass }}"
        validate_certs: false
      loop: "{{ jsondata  | json_query('tenants[*]') }}"
-#     with_items:  "{{  }}"
 
 
    - name: Create ap
@@ -69,6 +62,18 @@
      aci_ap:
        name: "{{ item.application_profiles.0.name }}"
        description: "{ item.application_profiles.description }}"
+       tenant: "{{ item.name }}"
+       <<: *cred  
+     loop: "{{ jsondata | json_query('tenants[*]') }}"
+
+
+
+
+
+   - name: create VRF
+     tags: vrf
+     aci_vrf:
+       vrf: "{{ item.vrf.name }}"
        tenant: "{{ item.name }}"
        <<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
