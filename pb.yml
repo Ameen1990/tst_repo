@@ -178,7 +178,7 @@
      debug:
      #aci_bd_subnet:
        #tenant: "{{ item.0.name }}"
-       msg: "{{ item.1.subnets.1.name }}"          # this returns three names , coz brifg_domains has three different lists called "subnets"
+       msg: "{{ item.1.subnets.0 }}"          # this returns three names , coz brifg_domains has three different lists called "subnets"
        #bd: "{{ item.1.name }}"                      # this returns three names 
        #gateway_ip: "{{ item.1.subnets.0.name }}"    # this returns three names
        #subnet_mask: "{{ item.1.subnets.0.mask }}"   # this returns three names
