@@ -190,4 +190,4 @@
        msg: "{{ item.0.application_profiles.0.epgs.0}}"   
      with_subelements:            
        - "{{ tenants }}"
-       - "bridge_domains"
+       - "application_profiles"
