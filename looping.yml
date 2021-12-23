@@ -31,6 +31,15 @@
      shell: cat /root/tst_repo/source.json
      register: result
 
+   - name: Set Credentials
+     tags: always
+     set_fact:
+       cred: &cred
+         host: "{{ inventory_hostname }}"
+         username: "{{ user }}"
+         password: "{{ pass }}"
+         validate_certs: false
+
    - name: save the Json data to a Variable as a Fact
      tags: always
      set_fact:
@@ -57,10 +66,11 @@
 
    - name: Create ap
      tags: debug1
-     debug:
-       #msg: "{{ item.application_profiles.0.name }}"
-       msg: "{ item.application_profiles.description }}"
-       #msg: "{{ item.name }}"
+     aci_ap:
+       name: "{{ item.application_profiles.0.name }}"
+       description: "{ item.application_profiles.description }}"
+       tenant: "{{ item.name }}"
+       <<: *cred  
      loop: "{{ jsondata | json_query('tenants[*]') }}"
 
 
