@@ -197,6 +197,6 @@
      debug:
        msg: "{{ item.1.name}}"   
      with_subelements:            
-       - "{{ application_profiles }}"
-       - "epgs"
+       - "{{ tenants }}"
+       - "application_profiles"
 
