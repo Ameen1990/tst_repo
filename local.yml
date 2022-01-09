@@ -1,5 +1,5 @@
 ---
--  hosts: apic
+-  hosts: localhost
    any_errors_fatal: true
    gather_facts: no
 
@@ -77,7 +77,7 @@
        - "bridge_domains"
 
 
-# epgs is subnested list, it has epg name, bd name then contracts list inside as well. 
+# epgs is sub-nested list, it has epg name, bd name then contracts list inside as well. 
    
    - name: Create EPG_Web_Server
      tags: epg
@@ -88,7 +88,7 @@
        bd: "{{ item.1.epgs.0.bd }}"    # that's why it wont be iterated upon, and epgs.0 must be specified. 
        <<: *cred                       # To iterate using "subelemenst", the output must be a dictionary.
      with_subelements:                 # alos, subelemenst, can iterrate over a dic and go two levels in depth, not more.
-       - "{{ tenants }}"
+       - "{{ tenants }}"               # if epgs list is one level upper, it will work perfecly, just like we created three bridge domains
        - "application_profiles"
 
 
@@ -115,6 +115,16 @@
        - "{{ tenants }}"
        - "bridge_domains"
 
+
+   - name: Create three Bridge-Domains
+     tags: debug10
+     debug:
+       #msg: "{{ item.0.name }}"
+       msg: "{{ item.1.subnets.0 }}" # returns the content of subnets,  list of dictonaries 
+       #msg: "{{ item.1.vrf }}"
+     with_subelements: 
+       - "{{ tenants }}"
+       - "bridge_domains"
 
 
    - name: ce
