@@ -192,3 +192,11 @@
        - "epgs"
 
 
+ - name: debug8
+     tags: debug8
+     debug:
+       msg: "{{ item.1.name}}"   
+     with_subelements:            
+       - "{{ application_profiles }}"
+       - "epgs"
+
