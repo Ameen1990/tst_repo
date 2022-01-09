@@ -192,7 +192,7 @@
        - "epgs"
 
 
- - name: debug8
+   - name: debug8
      tags: debug8
      debug:
        msg: "{{ item.1.name}}"   
