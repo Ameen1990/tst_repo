@@ -12,42 +12,6 @@
 
    tasks:
    
-   - name: Set Credentials
-     set_fact:
-       cred: &cred
-         validate_certs: false
-     
-   - name: Create a tenant
-     tags: tenant
-     aci_tenant:
-       tenant: "{{ item.name }}"
-       description: "{{ item.description }}"
-       <<: *cred
-     with_items:
-       - "{{ tenants }}"
-
-
-   - name: Create ap
-     tags: ap
-     aci_ap:
-       tenant: "{{ item.0.name  }}"
-       name: "{{ item.1.name }}"
-       description: "{{ item.1.description }}"
-       <<: *cred
-     with_subelements: 
-       - "{{ tenants }}"
-       - "application_profiles"
-
-   - name: create VRF
-     tags: vrf
-     aci_vrf:
-       vrf: "{{ item.1.name }}"
-       tenant: "{{ item.0.name }}"
-       <<: *cred
-     with_subelements: 
-       - "{{ tenants }}"
-       - "vrfs"
-
 # this iterates over three dictionaires 
    - name: Create three Bridge-Domains
      tags: bd
@@ -55,7 +19,6 @@
        tenant: "{{ item.0.name }}"
        bd: "{{ item.1.name }}"
        vrf: "{{ item.1.vrf }}"
-       <<: *cred  
      with_subelements: 
        - "{{ tenants }}"
        - "bridge_domains"
@@ -67,11 +30,10 @@
      aci_bd_subnet:
        tenant: "{{ item.0.name }}"
        name: "{{ item.1.subnets.0.name }}"          # Returns three names , coz bridge_domains has three different lists called "subnets".
-       bd: "{{ item.1.name }}"                      # subnets.0 coz, ".subnets" retursn list of dictionaries, while ".subnets.0" retruns only the dict.
+       bd: "{{ item.1.name }}"                      # "subnets.0" coz, ".subnets" retursn list of that has a dict in it, while ".subnets.0" retruns only the dict.
        gateway_ip: "{{ item.1.subnets.0.name }}"    # The process will be repeated 3 times, coz bridege_domains list has three "subnets" lists inside it. 
        subnet_mask: "{{ item.1.subnets.0.mask }}"   # To iterate over nested list of dictionaries, two level depth is the max
        scope: "{{ item.1.subnets.0.scope }}"        # Otherwise, you need to grab them one by one.
-       <<: *cred 
      with_subelements: 
        - "{{ tenants }}"
        - "bridge_domains"
@@ -86,7 +48,7 @@
        ap: "{{ item.1.name }}"
        epg: "{{ item.1.epgs.0.name }}" # This returns one name, application_profiles has one list called epgs and it has nested dictionaries.
        bd: "{{ item.1.epgs.0.bd }}"    # that's why it wont be iterated upon, and epgs.0 must be specified. 
-       <<: *cred                       # To iterate using "subelemenst", the output must be a dictionary.
+                                       # To iterate using "subelemenst", the output must be a dictionary.
      with_subelements:                 # alos, subelemenst, can iterrate over a dic and go two levels in depth, not more.
        - "{{ tenants }}"               # if epgs list is one level upper, it will work perfecly, just like we created three bridge domains
        - "application_profiles"
@@ -191,6 +153,7 @@
    - name: with_subelements -> loop
      tags: debug9
      debug:
-       msg: "{{ item.1.name }} "
-     loop: "{{ tenants|subelements('epgs') }}"
+       msg: "{{ item.1.epgs }} "
+     loop: "{{ tenants|subelements('application_profiles') }}"
+
 
