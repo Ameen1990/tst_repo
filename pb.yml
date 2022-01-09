@@ -28,7 +28,7 @@
        unsafe: yes
 
    vars_files:
-     - 2coding_challenge_ansible.yml
+     - coding_challenge_ansible.yml
 
    tasks:
    
@@ -92,8 +92,8 @@
        name: "{{ item.1.subnets.0.name }}"          # Returns three names , coz bridge_domains has three different lists called "subnets".
        bd: "{{ item.1.name }}"                      # subnets.0 coz, ".subnets" retursn list of dictionaries, while ".subnets.0" retruns only the dict.
        gateway_ip: "{{ item.1.subnets.0.name }}"    # The process will be repeated 3 times, coz bridege_domains list has three "subnets" lists inside it. 
-       subnet_mask: "{{ item.1.subnets.0.mask }}"
-       scope: "{{ item.1.subnets.0.scope }}"   
+       subnet_mask: "{{ item.1.subnets.0.mask }}"   # To iterate over nested list of dictionaries, two level depth is the max
+       scope: "{{ item.1.subnets.0.scope }}"        # Otherwise, you need to grab them one by one.
        <<: *cred 
      with_subelements: 
        - "{{ tenants }}"
