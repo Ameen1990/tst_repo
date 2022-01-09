@@ -205,5 +205,5 @@
      tags: debug9
      debug:
        msg: "{{ item.1.name }} "
-     loop: "{{ tenants|subelements('application_profiles') }}"
+     loop: "{{ tenants|subelements('epgs') }}"
 
