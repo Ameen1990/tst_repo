@@ -204,6 +204,6 @@
    - name: with_subelements -> loop
      tags: debug9
      debug:
-       msg: "{{ item.0.name }} - {{ item.1 }}"
+       msg: "{{ item.1.name }} "
      loop: "{{ tenants|subelements('application_profiles') }}"
 
