@@ -7,8 +7,9 @@
      ansible_connection: local
      #ansible_python_interpreter: /usr/bin/python3
      t_name: 11-Ameen
-     #vrf: am-vrf 
-     
+     vrf_name: 11-vrf 
+     ap_name: 11-ap
+
      bridgedomain:
        - { tn_name: 'am-tn-1', name: 'BD-101', status: created, vrf: 'am-vrf-1' }
        - { tn_name: 'am-tn-2', name: 'BD-102', status: created, vrf: 'am-vrf-1' }
@@ -48,25 +49,33 @@
        <<: *cred  
        path: api/mo/uni.json
        method: post
-       content: {
-                "fvTenant" : {
-                    "attributes" : {
-                        "dn":"uni/tn-just-name",
-                        "name":"just-name",
-                        "rn":"tn-just-name",
-                        "status":"created"
-                        },
-                        "children":[
-                          {
-                            "fvAp":
-                            {
-                            "attributes":
-                            {
-                              "dn":"uni/tn-just-name/ap-1-ap",
-                              "name":"1-ap",
-                              "rn":"ap-1-ap",
-                              "status":"created"}
-                              }}] },                          
-                              }
-                    
-   
+       content:
+         fvTenant:
+           attributes:
+             dn: uni/tn-{{ t_name }}
+             status: created
+           children:
+             - fvAp:
+                 attributes:
+                   dn: uni/tn-{{ t_name }}/ap-1-ap
+                   name: {{ ap_name }}
+                   rn: ap-{{ ap_name }}
+                   status: created
+             - fvBD:
+                 attributes:
+                   dn: uni/tn-1-{{ t_name }}/BD-1-bd
+                   arpFlood: true
+                   name": 1-bd
+                   rn: BD-1-bd
+                   status: created
+               #  children:
+             - fvRsCtx:
+                 attributes:
+                   tnFvCtxName: "{{ vrf_name }}"
+                   status: created   
+             - fvCtx: 
+                 attributes:
+                   dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
+                   name: {{ vrf_name }}
+                   rn: ctx-{{ vrf_name }}
+                   status: created
