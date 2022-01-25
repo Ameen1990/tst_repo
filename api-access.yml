@@ -55,6 +55,19 @@
              dn: uni/tn-{{ t_name }}
              status: created
            children:
+             - fvBD:
+                 attributes:
+                   dn: uni/tn-{{ t_name }}/BD-1-bd
+                   arpFlood: "true"
+                   name: 1-bd
+                   rn: BD-1-bd
+                   status: created
+             - fvCtx: 
+                 attributes:
+                   dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
+                   name: "{{ vrf_name }}"
+                   rn: ctx-{{ vrf_name }}
+                   status: created
              - fvAp:
                  attributes:
                    dn: uni/tn-{{ t_name }}/ap-{{ ap_name }}
@@ -74,16 +87,3 @@
                              attributes:
                                tnFvBDName: 1-bd
                                status: created
-             - fvBD:
-                 attributes:
-                   dn: uni/tn-{{ t_name }}/BD-1-bd
-                   arpFlood: "true"
-                   name: 1-bd
-                   rn: BD-1-bd
-                   status: created
-             - fvCtx: 
-                 attributes:
-                   dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
-                   name: "{{ vrf_name }}"
-                   rn: ctx-{{ vrf_name }}
-                   status: created
