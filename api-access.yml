@@ -51,7 +51,7 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "name" : "1-quatsch"
+                        "name" : "111"
                         }
                     },
               
@@ -59,9 +59,9 @@
                 {
                 "fvAp" : {
                     "attributes" : {
-                        "dn":"uni/tn-am-tn/ap-am-ap",
-                        "name" : "am-ap",
-                        "rn": "ap-am-ap",
+                        "dn":"uni/tn-111/ap-111-ap",
+                        "name" : "111-ap",
+                        "rn": "ap-111-ap",
                         "status": "created"
                         }
                     }
