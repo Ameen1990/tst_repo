@@ -1,1 +1,53 @@
 ---
+-  hosts: apic
+   any_errors_fatal: true
+   gather_facts: no
+
+   vars:
+     ansible_connection: local
+     ansible_python_interpreter: /usr/bin/python3
+     tenant: am-tn
+     vrf: am-vrf
+    
+   vars_prompt:
+     - name: "apic_ip"
+       prompt: "Enter APIC IP"
+       default: 'sandboxapicdc.cisco.com'
+       private: no
+
+     - name: "user"
+       prompt: "Enter your APIC Username"
+       default: 'admin'
+       unsafe: yes
+
+     - name: "pass"
+       prompt: "Enter your APIC Password"
+       default: '!v3G@!4@Y'
+       private: yes
+       unsafe: yes
+
+   tasks:
+   - name: Set Credentials
+     tags: always
+     set_fact:
+       cred: &cred
+         host: "{{ inventory_hostname }}"
+         username: "{{ user }}"
+         password: "{{ pass }}"
+         validate_certs: false
+
+
+
+   - name: Create a tenant
+     aci_rest:
+       <<: *cred  
+       path: api/mo/uni.json
+       method: post
+       content: {
+                "fvTenant" : {
+                    "attributes" : {
+                        "name" : "{{ tenant }}"
+                        }
+                    }
+                }
+
