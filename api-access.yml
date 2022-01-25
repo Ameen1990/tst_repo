@@ -51,9 +51,29 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "name" : "{{ item.name }}"
+                        "name" : "1-quatsch"
                         }
                     }
                 }
      loop: "{{ bridgedomain }}"
+   
+   
+   - name: Create Application profile
+     aci_rest:
+       <<: *cred  
+       path: api/mo/uni.json
+       method: post
+       content: {
+                "fvAp" : {
+                    "attributes" : {
+                        "dn":"uni/tn-am-tn/ap-am-ap"
+                        "name" : "am-ap"
+                        "rn": "ap-am-ap"
+                        "status": "created"
+                        }
+                    }
+                }
+ #    loop: "{{ bridgedomain }}"
 
+
+#{"fvAp":{"attributes":{"dn":"uni/tn-am-tn/ap-am-ap","name":"am-ap","rn":"ap-am-ap","status":"created"},"children":[]}}
