@@ -63,7 +63,7 @@
                    status: created
              - fvBD:
                  attributes:
-                   dn: uni/tn-1-{{ t_name }}/BD-1-bd
+                   dn: uni/tn-{{ t_name }}/BD-1-bd
                    arpFlood: "true"
                    name: 1-bd
                    rn: BD-1-bd
