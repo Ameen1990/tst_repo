@@ -65,7 +65,7 @@
                  children:
                   - fvSubnet:
                       attributes:
-                        dn: uni/tn-{{ item.t_name }}/BD-{{ item.d_name }}/subnet-[{{ item.sub_ip }}]
+                        dn: uni/tn-{{ item.t_name }}/BD-{{ item.bd_name }}/subnet-[{{ item.sub_ip }}]
                         ctrl: ""
                         ip: "{{ item.sub_ip }}"
                         rn: subnet-[{{ item.sub_ip }}]
