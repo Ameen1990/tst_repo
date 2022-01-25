@@ -69,6 +69,7 @@
                         ctrl: ""
                         ip: 10.0.0.1/24
                         rn: subnet-[10.0.0.1/24]
+                        scope: public
                         status: created
              - fvCtx: 
                  attributes:
@@ -97,7 +98,3 @@
                                status: modified
 
 
-
-
-
-                               # "Cannot create Bridge Domain for the EPG (fvRsBd); object uni/tn-11-Ameen/ap-11-ap/epg-2-epg/rsbd already exists."}
