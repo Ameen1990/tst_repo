@@ -95,7 +95,7 @@
                        children:
                          - fvRsBd:
                              attributes:
-                               tnFvBDName: {{ item.bd_name }}
+                               tnFvBDName: "{{ item.bd_name }}"
                                status: modified
      
      loop: "{{ bridgedomain }}"
