@@ -52,7 +52,7 @@
                 "fvTenant" : {
                     "attributes" : {
                         "dn":"uni/tn-{t_name}",
-                        "name": "{t_name}",
+                        "name":"{t_name}",
                         "rn":"tn-{t_name}",
                         "status":"created"
                         },
