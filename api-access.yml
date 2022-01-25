@@ -65,7 +65,7 @@
                  attributes:
                    dn: uni/tn-1-{{ t_name }}/BD-1-bd
                    arpFlood: true
-                   name": 1-bd
+                   name: 1-bd
                    rn: BD-1-bd
                    status: created
                #  children:
