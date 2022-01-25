@@ -56,7 +56,17 @@
                         "rn":"tn-1-tn",
                         "status":"created"
                         },
-                        "children":[{"fvAp":{"attributes":{"dn":"uni/tn-1-tn/ap-1-ap","name":"1-ap","rn":"ap-1-ap","status":"created"},"children":[]}}] }}
+                        "children":[
+                          {
+                            "fvAp":
+                            {
+                            "attributes":
+                            {
+                              "dn":"uni/tn-1-tn/ap-1-ap",
+                              "name":"1-ap",
+                              "rn":"ap-1-ap",
+                              "status":"created"},
+                              "children":[]}}] }}
                     
               
 # {"fvTenant":{"attributes":{"dn":"uni/tn-am-tn","name":"am-tn","rn":"tn-am-tn","status":"created"},"children":[]}}
