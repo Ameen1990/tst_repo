@@ -11,9 +11,9 @@
      #ap_name: 11-ap
 
      bridgedomain:
-       - { t_name: 'am-tn-1', bd_name: 'BD-101', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.10.0.1/24', bd_scope: private }
-       - { t_name: 'am-tn-2', bd_name: 'BD-102', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.30.0.1/24', bd_scope: private }
-       - { t_name: 'am-tn-3', bd_name: 'BD-103', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.20.0.1/24', bd_scope: public  }
+       - { t_name: 'am-tn-1', bd_name: 'BD-101', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.10.0.1/24', bd_scope: 'private', epg_name: 'web' }
+       - { t_name: 'am-tn-2', bd_name: 'BD-102', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.30.0.1/24', bd_scope: 'private', epg_name: 'App' }
+       - { t_name: 'am-tn-3', bd_name: 'BD-103', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.20.0.1/24', bd_scope: 'public', epg_name: 'D_center' }
 
    vars_prompt:
      - name: "apic_ip"
