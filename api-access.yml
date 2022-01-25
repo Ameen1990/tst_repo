@@ -76,6 +76,6 @@
              - fvCtx: 
                  attributes:
                    dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
-                   name: {{ vrf_name }}
+                   name: "{{ vrf_name }}"
                    rn: ctx-{{ vrf_name }}
                    status: created
