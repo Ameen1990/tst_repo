@@ -38,16 +38,51 @@
 
 
 
-   - name: Create a tenant
+#   - name: Create a tenant
+#     aci_rest:
+#       <<: *cred  
+#       path: api/mo/uni.json
+#       method: post
+#       content: {
+#                "fvTenant" : {
+#                    "attributes" : {
+#                        "name" : "{{ tenant }}"
+#                        }
+#                    }
+#                }
+
+
+# Die Zweite Methode
+   vars:
+     bridgedomain:
+       - { tn_name: 'am-tn-1', name: 'BD-101', status: "{{ the_status }}", vrf: 'am-vrf-1' }
+       - { tn_name: 'am-tn-2', name: 'BD-102', status: "{{ the_status }}", vrf: 'am-vrf-1' }
+       - { tn_name: 'am-tn-3', name: 'BD-103', status: "{{ the_status }}", vrf: 'am-vrf-1' }
+
+   - name: Add A Bridge Domain
      aci_rest:
-       <<: *cred  
+       <<: *cred
        path: api/mo/uni.json
        method: post
        content: {
-                "fvTenant" : {
-                    "attributes" : {
-                        "name" : "{{ tenant }}"
-                        }
-                    }
-                }
-
+                 "fvBD": {
+                     "attributes": {
+                         "dn": "uni/tn-{{ bd.tn_name }}/BD-{{ bd.name }}",
+                         "name": "{{ bd.name }}",
+                         "status": "{{ bd.status }}"
+                           }, 
+                           "children": [ 
+                               {
+                                   "fvRsCtx": {
+                                       "attributes": {
+                                           "tnFvCtxName": "{{ bd.vrf }}",
+                                           "status": "created,modified"
+                                            }
+                                         }
+                                      }
+                                   ]
+                                }
+                             }
+     loop: "{{ bridgedomain }}"
+     loop_control:
+       loop_var: bd
