@@ -6,14 +6,14 @@
    vars:
      ansible_connection: local
      ansible_python_interpreter: /usr/bin/python3
-     t_name: 11-Ameen
-     vrf_name: 11-vrf 
-     ap_name: 11-ap
+     #t_name: 11-Ameen
+     #vrf_name: 11-vrf 
+     #ap_name: 11-ap
 
      bridgedomain:
-       - { tn_name: 'am-tn-1', name: 'BD-101', status: created, vrf: 'am-vrf-1' }
-       - { tn_name: 'am-tn-2', name: 'BD-102', status: created, vrf: 'am-vrf-1' }
-       - { tn_name: 'am-tn-3', name: 'BD-103', status: created, vrf: 'am-vrf-1' }
+       - { t_name: 'am-tn-1', bd_name: 'BD-101', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.10.0.1/24', bd_scope: private }
+       - { t_name: 'am-tn-2', bd_name: 'BD-102', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.30.0.1/24', bd_scope: private }
+       - { t_name: 'am-tn-3', bd_name: 'BD-103', status: created, vrf_name: 'am-vrf-1', ap_name: '11-ap', sub_ip: '10.20.0.1/24', bd_scope: public  }
 
    vars_prompt:
      - name: "apic_ip"
@@ -52,49 +52,50 @@
        content:
          fvTenant:
            attributes:
-             dn: uni/tn-{{ t_name }}
+             dn: uni/tn-{{ item.t_name }}
              status: created
            children:
              - fvBD:
                  attributes:
-                   dn: uni/tn-{{ t_name }}/BD-1-bd
+                   dn: uni/tn-{{ item.t_name }}/BD-{{ item.bd_name }}
                    arpFlood: "true"
-                   name: 1-bd
-                   rn: BD-1-bd
+                   name: "{{ item.bd_name }}"
+                   rn: BD-{{ item.bd_name }}
                    status: created
                  children:
                   - fvSubnet:
                       attributes:
-                        dn: uni/tn-{{ t_name }}/BD-1-bd/subnet-[10.0.0.1/24]
+                        dn: uni/tn-{{ item.t_name }}/BD-{{ item.d_name }}/subnet-[{{ item.sub_ip }}]
                         ctrl: ""
-                        ip: 10.0.0.1/24
-                        rn: subnet-[10.0.0.1/24]
-                        scope: public
+                        ip: "{{ item.sub_ip }}"
+                        rn: subnet-[{{ item.sub_ip }}]
+                        scope: "{{ item.bd_scope }}"
                         status: created
+
              - fvCtx: 
                  attributes:
-                   dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
-                   name: "{{ vrf_name }}"
-                   rn: ctx-{{ vrf_name }}
+                   dn: uni/tn-{{ item.t_name }}/ctx-{{ item.vrf_name }}
+                   name: "{{ item.vrf_name }}"
+                   rn: ctx-{{ item.vrf_name }}
                    status: created
              - fvAp:
                  attributes:
-                   dn: uni/tn-{{ t_name }}/ap-{{ ap_name }}
-                   name: "{{ ap_name }}"
-                   rn: ap-{{ ap_name }}
+                   dn: uni/tn-{{ item.t_name }}/ap-{{ item.ap_name }}
+                   name: "{{ item.ap_name }}"
+                   rn: ap-{{ item.ap_name }}
                    status: created
                  children:
                    - fvAEPg: 
                        attributes:
-                         dn: uni/tn-{{ t_name }}/ap-{{ ap_name }}/epg-2-epg
-                         name: 2-epg
+                         dn: uni/tn-{{ item.t_name }}/ap-{{ item.ap_name }}/epg-{{ item.epg_name }}
+                         name: {{ item.epg_name }}
                          prio: level3
-                         rn: epg-2-epg
+                         rn: epg-{{ item.epg_name }}
                          status: created
                        children:
                          - fvRsBd:
                              attributes:
-                               tnFvBDName: 1-bd
+                               tnFvBDName: {{ item.bd_name }}
                                status: modified
-
-
+     
+     loop: "{{ bridgedomain }}"
