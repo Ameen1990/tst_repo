@@ -86,4 +86,7 @@
                          - fvRsBd:
                              attributes:
                                tnFvBDName: 1-bd
-                               status: created
+                               status: modified
+
+
+                               # "Cannot create Bridge Domain for the EPG (fvRsBd); object uni/tn-11-Ameen/ap-11-ap/epg-2-epg/rsbd already exists."}
