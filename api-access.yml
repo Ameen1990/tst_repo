@@ -66,9 +66,9 @@
        content: {
                 "fvAp" : {
                     "attributes" : {
-                        "dn":"uni/tn-am-tn/ap-am-ap"
-                        "name" : "am-ap"
-                        "rn": "ap-am-ap"
+                        "dn":"uni/tn-am-tn/ap-am-ap",
+                        "name" : "am-ap",
+                        "rn": "ap-am-ap",
                         "status": "created"
                         }
                     }
