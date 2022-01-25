@@ -10,9 +10,9 @@
      #vrf: am-vrf 
      
      bridgedomain:
-       - { tn_name: 'am-tn-1', name: 'BD-101', status: "{{ the_status }}", vrf: 'am-vrf-1' }
-       - { tn_name: 'am-tn-2', name: 'BD-102', status: "{{ the_status }}", vrf: 'am-vrf-1' }
-       - { tn_name: 'am-tn-3', name: 'BD-103', status: "{{ the_status }}", vrf: 'am-vrf-1' }
+       - { tn_name: 'am-tn-1', name: 'BD-101', status: created, vrf: 'am-vrf-1' }
+       - { tn_name: 'am-tn-2', name: 'BD-102', status: created, vrf: 'am-vrf-1' }
+       - { tn_name: 'am-tn-3', name: 'BD-103', status: created, vrf: 'am-vrf-1' }
 
    vars_prompt:
      - name: "apic_ip"
