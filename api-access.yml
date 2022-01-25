@@ -62,6 +62,14 @@
                    name: 1-bd
                    rn: BD-1-bd
                    status: created
+                 children:
+                  - fvSubnet:
+                      attributes:
+                        dn: uni/tn-{{ t_name }}/BD-1-bd/subnet-[10.0.0.1/24]
+                        ctrl: ""
+                        ip: 10.0.0.1/24
+                        rn: subnet-[10.0.0.1/24]
+                        status: created
              - fvCtx: 
                  attributes:
                    dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
@@ -87,6 +95,9 @@
                              attributes:
                                tnFvBDName: 1-bd
                                status: modified
+
+
+
 
 
                                # "Cannot create Bridge Domain for the EPG (fvRsBd); object uni/tn-11-Ameen/ap-11-ap/epg-2-epg/rsbd already exists."}
