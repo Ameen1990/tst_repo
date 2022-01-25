@@ -66,10 +66,8 @@
                               "name":"1-ap",
                               "rn":"ap-1-ap",
                               "status":"created"},
-                              "children":[]}}] },
-                              
-                              
-                             "fvCtx":{"attributes":{"dn":"uni/tn-1-tn/ctx-am-vrf","name":"am-vrf","rn":"ctx-am-vrf","status":"created"}} 
+                              "children":["fvCtx":{"attributes":{"dn":"uni/tn-1-tn/ctx-am-vrf","name":"am-vrf","rn":"ctx-am-vrf","status":"created"}} 
+                             ]}}] }                          
                               }
                     
               
