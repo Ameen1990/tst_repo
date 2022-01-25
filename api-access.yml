@@ -1,11 +1,11 @@
 ---
 -  hosts: apic
-   any_errors_fatal: true
+   any_errors_fatal: "true"
    gather_facts: no
 
    vars:
      ansible_connection: local
-     #ansible_python_interpreter: /usr/bin/python3
+     ansible_python_interpreter: /usr/bin/python3
      t_name: 11-Ameen
      vrf_name: 11-vrf 
      ap_name: 11-ap
