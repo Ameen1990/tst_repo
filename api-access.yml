@@ -1,5 +1,5 @@
 ---
--  hosts: apic
+-  hosts: apic1
    any_errors_fatal: "true"
    gather_facts: no
 
