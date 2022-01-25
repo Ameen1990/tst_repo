@@ -88,7 +88,7 @@
                    - fvAEPg: 
                        attributes:
                          dn: uni/tn-{{ item.t_name }}/ap-{{ item.ap_name }}/epg-{{ item.epg_name }}
-                         name: {{ item.epg_name }}
+                         name: "{{ item.epg_name }}"
                          prio: level3
                          rn: epg-{{ item.epg_name }}
                          status: created
