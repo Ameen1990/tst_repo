@@ -68,11 +68,6 @@
                    name: 1-bd
                    rn: BD-1-bd
                    status: created
-               #  children:
-             - fvRsCtx:
-                 attributes:
-                   tnFvCtxName: "{{ vrf_name }}"
-                   status: created   
              - fvCtx: 
                  attributes:
                    dn: uni/tn-{{ t_name }}/ctx-{{ vrf_name }}
