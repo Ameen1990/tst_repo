@@ -1,6 +1,6 @@
 ---
 -  hosts: apic
-   any_errors_fatal: true
+   any_errors_fatal: "true"
    gather_facts: no
 
    vars:
@@ -64,7 +64,7 @@
              - fvBD:
                  attributes:
                    dn: uni/tn-1-{{ t_name }}/BD-1-bd
-                   arpFlood: true
+                   arpFlood: "true"
                    name: 1-bd
                    rn: BD-1-bd
                    status: created
