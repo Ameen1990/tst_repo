@@ -75,15 +75,15 @@
                    rn: ctx-{{ vrf_name }}
                    status: created
 
-             - fvAEPg: 
-                 attributes:
-                   dn: uni/tn-{{ t_name }}/ap-{{ ap_name }}/epg-2-epg
-                   name: 2-epg
-                   prio: level3
-                   rn: epg-2-epg
-                   status: created
-                 children:
-                 fvRsBd:
-                   attributes:
-                   tnFvBDName: 1-bd
-                   status: created
+            # - fvAEPg: 
+             #    attributes:
+              #     dn: uni/tn-{{ t_name }}/ap-{{ ap_name }}/epg-2-epg
+               #    name: 2-epg
+               #    prio: level3
+                #   rn: epg-2-epg
+                 #  status: created
+             #    children:
+              #   fvRsBd:
+               #    attributes:
+                #   tnFvBDName: 1-bd
+                 #  status: created
