@@ -51,9 +51,9 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "dn":"uni/tn-"{t_name}"",
-                        "name":""{t_name}"",
-                        "rn":"tn-"{t_name}"",
+                        "dn":"uni/tn-'{t_name}'",
+                        "name":"'{t_name}'",
+                        "rn":"tn-'{t_name}'",
                         "status":"created"
                         },
                         "children":[
@@ -62,54 +62,11 @@
                             {
                             "attributes":
                             {
-                              "dn":"uni/tn-"{t_name}"/ap-1-ap",
+                              "dn":"uni/tn-'{t_name}'/ap-1-ap",
                               "name":"1-ap",
                               "rn":"ap-1-ap",
                               "status":"created"}
                               }}] },                          
-
                               }
                     
-              
-# {"fvTenant":{"attributes":{"dn":"uni/tn-am-tn","name":"am-tn","rn":"tn-am-tn","status":"created"},"children":[]}}
-
-# {"fvAp":{"attributes":{"dn":"uni/tn-am-tn/ap-am-ap","name":"am-ap","rn":"ap-am-ap","status":"created"},"children":[]}}
-
-
-           #     "children":[
-          #      {
-         #       "fvAp" : {
-        #            "attributes" : {
-       #                 "dn":"uni/tn-111/ap-111-ap",
-      #                  "name" : "111-ap",
-     #                   "rn": "ap-111-ap",
-    #                    "status": "created"
-   #                     }
-  #                  }
- #               }]
-#                }
-
-    # loop: "{{ bridgedomain }}"
    
-   
-#   - name: Create Application profile
-#     aci_rest:
-#       <<: *cred  
- #      path: api/mo/uni.json
-  #     method: post
-   #    content: {
-    #            "fvAp" : {
-     #               "attributes" : {
-      #                  "dn":"uni/tn-am-tn/ap-am-ap",
-       #                 "name" : "am-ap",
-        #                "rn": "ap-am-ap",
-         #               "status": "created"
-          #              }
-          #          }
-          #      }
- #    loop: "{{ bridgedomain }}"
-
-
-#{"fvAp":{"attributes":{"dn":"uni/tn-am-tn/ap-am-ap","name":"am-ap","rn":"ap-am-ap","status":"created"},"children":[]}}
-
-
