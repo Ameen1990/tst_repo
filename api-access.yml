@@ -51,9 +51,9 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "dn":"uni/tn-'{t_name}'",
-                        "name":"'{t_name}'",
-                        "rn":"tn-'{t_name}'",
+                        "dn":"uni/tn-{t_name}",
+                        "name":"{t_name}",
+                        "rn":"tn-{t_name}",
                         "status":"created"
                         },
                         "children":[
@@ -62,7 +62,7 @@
                             {
                             "attributes":
                             {
-                              "dn":"uni/tn-'{t_name}'/ap-1-ap",
+                              "dn":"uni/tn-{t_name}/ap-1-ap",
                               "name":"1-ap",
                               "rn":"ap-1-ap",
                               "status":"created"}
