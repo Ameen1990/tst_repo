@@ -43,7 +43,7 @@
 
 
 
-   - name: Create a tenant
+   - name: Create a tenant & AP
      aci_rest:
        <<: *cred  
        path: api/mo/uni.json
@@ -51,22 +51,31 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "name" : "111"
-                        }
-                    },
+                        "dn":"uni/tn-1-tn",
+                        "name" : "1-tn",
+                        "rn":"tn-1-tn",
+                        "status":"created"
+                        },
+                        "children":[{"fvAp":{"attributes":{"dn":"uni/tn-1-tn/ap-1-ap","name":"1-ap","rn":"ap-1-ap","status":"created"},"children":[]}}] }}
+                    
               
-                "children":[
-                {
-                "fvAp" : {
-                    "attributes" : {
-                        "dn":"uni/tn-111/ap-111-ap",
-                        "name" : "111-ap",
-                        "rn": "ap-111-ap",
-                        "status": "created"
-                        }
-                    }
-                }]
-                }
+# {"fvTenant":{"attributes":{"dn":"uni/tn-am-tn","name":"am-tn","rn":"tn-am-tn","status":"created"},"children":[]}}
+
+# {"fvAp":{"attributes":{"dn":"uni/tn-am-tn/ap-am-ap","name":"am-ap","rn":"ap-am-ap","status":"created"},"children":[]}}
+
+
+           #     "children":[
+          #      {
+         #       "fvAp" : {
+        #            "attributes" : {
+       #                 "dn":"uni/tn-111/ap-111-ap",
+      #                  "name" : "111-ap",
+     #                   "rn": "ap-111-ap",
+    #                    "status": "created"
+   #                     }
+  #                  }
+ #               }]
+#                }
 
     # loop: "{{ bridgedomain }}"
    
