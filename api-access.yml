@@ -6,7 +6,7 @@
    vars:
      ansible_connection: local
      #ansible_python_interpreter: /usr/bin/python3
-     #tenant: am-tn
+     tn-name: 111111
      #vrf: am-vrf 
      
      bridgedomain:
@@ -51,9 +51,9 @@
        content: {
                 "fvTenant" : {
                     "attributes" : {
-                        "dn":"uni/tn-1-tn",
-                        "name" : "1-tn",
-                        "rn":"tn-1-tn",
+                        "dn":"uni/tn-{tn-name}",
+                        "name": "{tn-name}",
+                        "rn":"tn-{tn-name}",
                         "status":"created"
                         },
                         "children":[
@@ -62,12 +62,12 @@
                             {
                             "attributes":
                             {
-                              "dn":"uni/tn-1-tn/ap-1-ap",
+                              "dn":"uni/tn-{tn-name}/ap-1-ap",
                               "name":"1-ap",
                               "rn":"ap-1-ap",
-                              "status":"created"},
-                              "children":["fvCtx":{"attributes":{"dn":"uni/tn-1-tn/ctx-am-vrf","name":"am-vrf","rn":"ctx-am-vrf","status":"created"}} 
-                             ]}}] }                          
+                              "status":"created"}
+                              }}] },                          
+
                               }
                     
               
@@ -111,3 +111,5 @@
 
 
 #{"fvAp":{"attributes":{"dn":"uni/tn-am-tn/ap-am-ap","name":"am-ap","rn":"ap-am-ap","status":"created"},"children":[]}}
+
+
