@@ -1,0 +1,72 @@
+---
+
+- name: Configure Static Ports
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  vars:
+    aci_login: &aci_login
+      hostname: '{{ ansible_host }}'
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") | default(ansible_user, true) }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") | default(ansible_password, true) }}'
+      validate_certs: no
+
+  tasks:
+  - name: Create a Static Port Interface Policy Group
+    aci_interface_policy_leaf_policy_group:
+      <<: *aci_login
+      lag_type: leaf
+      description: "{{ lap_desc }}"
+      policy_group: LAP-{{ lap_name|upper }}
+      storm_control_interface_policy: SC-0.1
+      aep_name: '{{ aepname_reset }}'
+      lldp_policy: LLDP-{{ lldp | upper }}
+      cdp_policy: CDP-{{ cdp | upper }}
+      state: present
+    vars:
+      aepname_reset: '{{ "AEP-" + hardware_env if hardware_env is defined and hardware_env | length > 0 else aepname | default("AEP-IAI", true) | upper }}'
+
+  - name: Add a new leaf_interface_profile
+    aci_interface_policy_leaf_profile:
+      <<: *aci_login
+      leaf_interface_profile: LIP-{{ leaf }}
+      state: present
+
+  - name: Associate an Interface Access Port Selector to an Interface Policy Leaf Profile with a Policy Group
+    aci_access_port_to_interface_policy_leaf_profile:
+      <<: *aci_login
+      leaf_interface_profile: LIP-{{ leaf }}
+      access_port_selector: "APS-{{ hostname | upper }}"
+      interface_type: switch_port
+      policy_group: LAP-{{ lap_name|upper }}
+      state: present
+
+  - name: Associate an access port block (single port) to an interface selector
+    aci_access_port_block_to_access_port:
+      <<: *aci_login
+      leaf_interface_profile: LIP-{{ leaf }}
+      access_port_selector: "APS-{{ hostname | upper }}"
+      leaf_port_blk: "{{ hostname | upper }}_{{ port }}"
+      from_port: "{{ port }}"
+      to_port: "{{ port }}"
+      leaf_port_blk_description: "{{ hostname | upper }}"
+      state: present
+
+  - name: Deploy Static Path binding for given EPG
+    aci_static_binding_to_epg:
+      <<: *aci_login
+      tenant_name: "{{ tenant_name }}"
+      app_profile_name: AP-{{ vrf_rot | default('INT', true) }}
+      epg_name: EPG-INT-{{ '%04d' | format(vlan | int) }}-{{ vlan_name|upper }}
+      vlan_id: "{{ '%04d' | format(vlan | int) }}"
+      primary_vlan_id: "{{ pvlan_id | default(omit, true) }}"
+      deploy_immediacy: immediate
+      interface_mode: "{{ if_mode }}"
+      interface_type: switch_port
+      pod_id: 1
+      leafs: "{{ leaf }}"
+      interface: "1/{{ port }}"
+      description: "{{ hostname }}"
+      state: present
+    when: if_mode is defined
