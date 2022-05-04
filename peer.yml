@@ -1,0 +1,447 @@
+---
+
+- name: Configure a L3Out towards XTCFW
+  hosts: all
+  gather_facts: no
+  connection: local
+
+  vars:
+    aci_login: &aci_login
+      hostname: '{{ ansible_host }}'
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") | default(ansible_user, true) }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") | default(ansible_password, true) }}'
+      validate_certs: no
+
+  pre_tasks:
+  - name: Checking the provided Switch IPs
+    fail:
+      msg: There is a missing Switch IP.
+    when:
+    - ipv4_sw101 is undefined or
+      ipv4_sw102 is undefined
+    - ipv6_sw101 is undefined or
+      ipv6_sw102 is undefined
+
+  - name: Checking the Provided Peer IPs
+    fail:
+      msg: There is a missing Peer IP.
+    when:
+    - xtcfw_bgp_ipv4 is undefined
+    - xtcfw_bgp_ipv6 is undefined
+
+  tasks:
+  - name: Create a tenant
+    tags: x
+    aci_tenant:
+      <<: *aci_login
+      tenant: "{{ tenant_name }}"
+
+  - name: Create new VLAN pool
+    tags: x
+    aci_vlan_pool:
+      <<: *aci_login
+      pool: "{{ pool_name }}"
+      pool_allocation_mode: static
+      state: present
+
+  - name: Add a new VLAN encap block to a existing Vlan Pool
+    aci_vlan_pool_encap_block:
+      <<: *aci_login
+      pool_name: VP-IAI_L3
+      allocation_mode: static
+      pool_allocation_mode: static
+      block_name: BN-{{ vrf }}_XTCFW
+      block_start: "{{ vlan }}"
+      block_end: "{{ vlan }}"
+      state: present
+
+  - name: Add VRF
+    aci_vrf:
+      <<: *aci_login
+      vrf: VRF-{{ vrf }}
+      tenant: "{{ tenant_name }}"
+      descr: "{{ vrf }}"
+      policy_control_direction: ingress
+      state: present
+
+  - name: Configure L3OUT IPv4 for existing VRF to XTCFW
+    aci_rest:
+      <<: *aci_login
+      method: post
+      path: "api/mo/uni.json"
+      content:
+        l3extOut:
+          attributes:
+            dn: uni/tn-{{ tenant_name }}/out-L3OUT-{{ vrf }}-XTCFW/
+            name: L3OUT-{{ vrf }}-XTCFW
+            enforceRtctrl: "export,import"
+          children:
+          - bgpExtP:
+              attributes:
+                descr: ""
+          - l3extInstP:
+              attributes:
+                floodOnEncap: "disabled"
+                matchT: "AtleastOne"
+                name: "EN-{{ vrf }}-XTCFW"
+                prefGrMemb: "exclude"
+          - l3extLNodeP:
+              attributes:
+                name: "NP-{{ vrf }}-XTCFW"
+              children:
+              - l3extLIfP:
+                  attributes:
+                    name: "IP-{{ vrf }}-XTCFW-001{{ vdom_combined }}"
+                  children:
+                  - l3extRsPathL3OutAtt:
+                      attributes:
+                        addr: "{{ ipv4_sw101 }}"
+                        autostate: "disabled"
+                        descr: "{{ vrf }}-XTCFW"
+                        encap: vlan-{{ vlan }}
+                        encapScope: "local"
+                        ifInstT: "ext-svi"
+                        mtu: "inherit"
+                        tDn: "topology/pod-1/paths-101/pathep-[{{ xtcfw_name1 }}]"
+                      children:
+                      - bgpPeerP:
+                          attributes:
+                            addr: "{{ xtcfw_bgp_ipv4 | default(xtcfw_bgp_ip) }}"
+                            allowedSelfAsCnt: "3"
+                            ctrl: "allow-self-as,send-com,send-ext-com"
+                            password: "{{ bgppw }}"
+                          children:
+                          - bgpAsP:
+                              attributes:
+                                asn: "65401"
+              - l3extLIfP:
+                  attributes:
+                    name: "IP-{{ vrf }}-XTCFW-002{{ vdom_combined }}"
+                  children:
+                  - l3extRsPathL3OutAtt:
+                      attributes:
+                        addr: "{{ ipv4_sw102 }}"
+                        autostate: "disabled"
+                        descr: "{{ vrf }}-XTCFW"
+                        encap: vlan-{{ vlan }}
+                        encapScope: "local"
+                        ifInstT: "ext-svi"
+                        mtu: "inherit"
+                        tDn: "topology/pod-1/paths-102/pathep-{{ xtcfw_name2 }}"
+                      children:
+                      - bgpPeerP:
+                          attributes:
+                            addr: "{{ xtcfw_bgp_ipv4 | default(xtcfw_bgp_ip) }}"
+                            allowedSelfAsCnt: "3"
+                            ctrl: "allow-self-as,send-com,send-ext-com"
+                            password: "{{ bgppw }}"
+                          children:
+                          - bgpAsP:
+                              attributes:
+                                asn: "65401"
+              - l3extRsNodeL3OutAtt:
+                  attributes:
+                    rtrId: "10.{{ second_octet }}.{{ third_octet }}.101"
+                    rtrIdLoopBack: "no"
+                    tDn: "topology/pod-1/node-101"
+                  children:
+                  - l3extInfraNodeP:
+                      attributes:
+                        fabricExtCtrlPeering: "no"
+                        fabricExtIntersiteCtrlPeering: "no"
+              - l3extRsNodeL3OutAtt:
+                  attributes:
+                    rtrId: "10.{{ second_octet }}.{{ third_octet }}.102"
+                    rtrIdLoopBack: "no"
+                    tDn: "topology/pod-1/node-102"
+                  children:
+                  - l3extInfraNodeP:
+                      attributes:
+                        fabricExtCtrlPeering: "no"
+                        fabricExtIntersiteCtrlPeering: "no"
+          - l3extRsEctx:
+              attributes:
+                tnFvCtxName: VRF-{{ vrf }}
+          - l3extRsL3DomAtt:
+              attributes:
+                tDn: "uni/l3dom-L3DOM-IAI"
+          - rtctrlProfile:
+              attributes:
+                name: "default-import"
+                type: combinable
+              children:
+              - rtctrlCtxP:
+                  attributes:
+                    action: "permit"
+                    name: "RCC-IMPORT-PERMIT"
+                    order: "1"
+                  children:
+                  - rtctrlRsCtxPToSubjP:
+                      attributes:
+                        tnRtctrlSubjPName: "{{ import_match_rule_name | default('MR-DEFAULT_ONLY', true) }}"
+          - rtctrlProfile:
+              attributes:
+                name: "default-export"
+                type: combinable
+              children:
+              - rtctrlCtxP:
+                  attributes:
+                    action: "permit"
+                    name: "RCC-EXPORT-PERMIT"
+                    order: "1"
+                  children:
+                  - rtctrlRsCtxPToSubjP:
+                      attributes:
+                        tnRtctrlSubjPName: "{{ export_match_rule_name | default('MR-ALL_PREFIXES', true) }}"
+    vars:
+      vdom_combined: "{{ '-TO_' + vdom | upper if vdom is defined and vdom | length > 0 else '' }}"
+      vpnid_adapted: "{{ rtrid if rtrid is defined else vpnid }}"
+      second_octet: "{{ (vpnid_adapted | int // 255) + 1 }}"
+      third_octet: "{{ vpnid_adapted | int % 255 }}"
+    when:
+    # yaml lists are AND combined
+    - ipv4_sw101 is defined
+    - ipv4_sw102 is defined
+    - ipv4_sw101|ipaddr != false
+    - ipv4_sw102|ipaddr != false
+
+  - name: Configure L3OUT IPv6 for existing VRF to XTCFW
+    aci_rest:
+      <<: *aci_login
+      method: post
+      path: "api/mo/uni.json"
+      content:
+        l3extOut:
+          attributes:
+            dn: uni/tn-{{ tenant_name }}/out-L3OUT-{{ vrf }}-XTCFW/
+            name: L3OUT-{{ vrf }}-XTCFW
+            enforceRtctrl: "export,import"
+          children:
+          - bgpExtP:
+              attributes:
+                descr: ""
+          - l3extInstP:
+              attributes:
+                floodOnEncap: "disabled"
+                matchT: "AtleastOne"
+                name: "EN-{{ vrf }}-XTCFW"
+                prefGrMemb: "exclude"
+          - l3extLNodeP:
+              attributes:
+                name: "NP-{{ vrf }}-XTCFW"
+              children:
+              - l3extLIfP:
+                  attributes:
+                    name: "IP-{{ vrf }}-XTCFW-001-V6{{ vdom_combined }}"
+                  children:
+                  - l3extRsPathL3OutAtt:
+                      attributes:
+                        addr: "{{ ipv6_sw101 }}"
+                        autostate: "disabled"
+                        descr: "{{ vrf }}-XTCFW"
+                        encap: vlan-{{ vlan }}
+                        encapScope: "local"
+                        ifInstT: "ext-svi"
+                        mtu: "inherit"
+                        tDn: "topology/pod-1/paths-101/pathep-[{{ xtcfw_name1 }}]"
+                      children:
+                      - bgpPeerP:
+                          attributes:
+                            addr: "{{ xtcfw_bgp_ipv6 }}"
+                            allowedSelfAsCnt: "3"
+                            ctrl: "allow-self-as,send-com,send-ext-com"
+                            password: "{{ bgppw }}"
+                          children:
+                          - bgpAsP:
+                              attributes:
+                                asn: "65401"
+              - l3extLIfP:
+                  attributes:
+                    name: "IP-{{ vrf }}-XTCFW-002-V6{{ vdom_combined }}"
+                  children:
+                  - l3extRsPathL3OutAtt:
+                      attributes:
+                        addr: "{{ ipv6_sw102 }}"
+                        autostate: "disabled"
+                        descr: "{{ vrf }}-XTCFW"
+                        encap: vlan-{{ vlan }}
+                        encapScope: "local"
+                        ifInstT: "ext-svi"
+                        mtu: "inherit"
+                        tDn: "topology/pod-1/paths-102/pathep-{{ xtcfw_name2 }}"
+                      children:
+                      - bgpPeerP:
+                          attributes:
+                            addr: "{{ xtcfw_bgp_ipv6 }}"
+                            allowedSelfAsCnt: "3"
+                            ctrl: "allow-self-as,send-com,send-ext-com"
+                            password: "{{ bgppw }}"
+                          children:
+                          - bgpAsP:
+                              attributes:
+                                asn: "65401"
+              - l3extRsNodeL3OutAtt:
+                  attributes:
+                    rtrId: "10.{{ second_octet }}.{{ third_octet }}.101"
+                    rtrIdLoopBack: "no"
+                    tDn: "topology/pod-1/node-101"
+                  children:
+                  - l3extInfraNodeP:
+                      attributes:
+                        fabricExtCtrlPeering: "no"
+                        fabricExtIntersiteCtrlPeering: "no"
+              - l3extRsNodeL3OutAtt:
+                  attributes:
+                    rtrId: "10.{{ second_octet }}.{{ third_octet }}.102"
+                    rtrIdLoopBack: "no"
+                    tDn: "topology/pod-1/node-102"
+                  children:
+                  - l3extInfraNodeP:
+                      attributes:
+                        fabricExtCtrlPeering: "no"
+                        fabricExtIntersiteCtrlPeering: "no"
+          - l3extRsEctx:
+              attributes:
+                tnFvCtxName: VRF-{{ vrf }}
+          - l3extRsL3DomAtt:
+              attributes:
+                tDn: "uni/l3dom-L3DOM-IAI"
+          - rtctrlProfile:
+              attributes:
+                name: "default-import"
+                type: combinable
+              children:
+              - rtctrlCtxP:
+                  attributes:
+                    action: "permit"
+                    name: "RCC-IMPORT-PERMIT"
+                    order: "1"
+                  children:
+                  - rtctrlRsCtxPToSubjP:
+                      attributes:
+                        tnRtctrlSubjPName: "{{ import_match_rule_name | default('MR-DEFAULT_ONLY', true) }}"
+          - rtctrlProfile:
+              attributes:
+                name: "default-export"
+                type: combinable
+              children:
+              - rtctrlCtxP:
+                  attributes:
+                    action: "permit"
+                    name: "RCC-EXPORT-PERMIT"
+                    order: "1"
+                  children:
+                  - rtctrlRsCtxPToSubjP:
+                      attributes:
+                        tnRtctrlSubjPName: "{{ export_match_rule_name | default('MR-ALL_PREFIXES', true) }}"
+    vars:
+      vdom_combined: "{{ '-TO_' + vdom | upper if vdom is defined and vdom | length > 0 else '' }}"
+      vpnid_adapted: "{{ rtrid if rtrid is defined else vpnid }}"
+      second_octet: "{{ (vpnid_adapted | int // 255) + 1 }}"
+      third_octet: "{{ vpnid_adapted | int % 255 }}"
+    when:
+    # yaml lists are AND combined
+    - ipv6_sw101 is defined
+    - ipv6_sw102 is defined
+    - ipv6_sw101|ipaddr != false
+    - ipv6_sw102|ipaddr != false
+
+  - name: Configure Match Rule
+    aci_rest:
+      <<: *aci_login
+      method: post
+      path: "api/mo/uni.json"
+      content:
+        rtctrlSubjP:
+          attributes:
+            dn: uni/tn-{{ tenant_name }}/subj-{{ item.mr_name }}/
+            name: "{{ item.mr_name }}"
+          children:
+          - rtctrlMatchRtDest:
+              attributes:
+                aggregate: "{{ item.aggregate }}"
+                ip: "{{ item.ip }}"
+    with_items:
+    - {mr_name: "MR-DEFAULT_ONLY", ip: "0.0.0.0/0", aggregate: "no"}
+    - {mr_name: "MR-DEFAULT_ONLY", ip: "::/0", aggregate: "no"}
+    - {mr_name: "MR-ALL_PREFIXES", ip: "0.0.0.0/0", aggregate: "yes"}
+    - {mr_name: "MR-ALL_PREFIXES", ip: "::/0", aggregate: "yes"}
+
+  - name: Add a new contract
+    aci_contract:
+      <<: *aci_login
+      tenant_name: "{{ tenant_name }}"
+      contract_name: CON-{{ vrf|truncate(25, True, '') }}-{{ service_name_provided|truncate(16, True, '') }}-XTCFW
+      scope: context
+      state: present
+    when: service_name_provided is defined and service_name_provided != ""
+
+  - name: Add a new contract subject
+    aci_contract_subject:
+      <<: *aci_login
+      tenant_name: "{{ tenant_name }}"
+      contract_name: CON-{{ vrf|truncate(25, True, '') }}-{{ service_name_provided|truncate(16, True, '') }}-XTCFW
+      subject_name: ANY
+      reverse_filter: yes
+      state: present
+    when: service_name_provided is defined and service_name_provided != ""
+
+  - name: Add a new filter to a tenant
+    aci_filter:
+      <<: *aci_login
+      filter_name: ANY
+      tenant_name: "{{ tenant_name }}"
+      state: present
+    when: service_name_provided is defined and service_name_provided != ""
+
+  - name: Add a new contract subject to filter binding
+    aci_contract_subject_to_filter:
+      <<: *aci_login
+      tenant_name: "{{ tenant_name }}"
+      contract_name: CON-{{ vrf|truncate(25, True, '') }}-{{ service_name_provided|truncate(16, True, '') }}-XTCFW
+      subject_name: ANY
+      filter_name: ANY
+      log: none
+      state: present
+    when: service_name_provided is defined and service_name_provided != ""
+
+  - name: "Check 'ANY' filter entry"
+    aci_filter_entry:
+      <<: *aci_login
+      tenant: "{{ tenant_name }}"
+      filter_name: 'ANY'
+      entry_name: 'ANY'
+      state: query
+    register: filter_entry_any
+
+  - name: Create filter entry
+    aci_filter_entry:
+      <<: *aci_login
+      filter: ANY
+      description: "{{ description | default(omit) }}"
+      tenant: "{{ tenant_name }}"
+      entry: ALL_IP
+      icmp_msg_type: "{{ icmp_msg_type | default(omit) }}"
+      ether_type: ip
+      state: present
+    when:
+    - service_name_provided is defined
+    - service_name_provided != ""
+    - filter_entry_any is not defined or
+      filter_entry_any.current is not defined or
+      filter_entry_any.current | length == 0
+
+  - name: Configure Contract for L3OUT
+    aci_rest:
+      <<: *aci_login
+      method: post
+      path: "api/mo/uni.json"
+      content:
+        l3extInstP:
+          attributes:
+            dn: uni/tn-{{ tenant_name }}/out-L3OUT-{{ vrf }}-XTCFW/instP-EN-{{ vrf }}-XTCFW
+          children:
+          - fvRsCons:
+              attributes:
+                tnVzBrCPName: "CON-{{ vrf|truncate(25, True, '') }}-{{ service_name_provided|truncate(16, True, '') }}-XTCFW"
+    when: service_name_provided is defined and service_name_provided != ""
