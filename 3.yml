@@ -1,0 +1,204 @@
+---
+- name: create_SG_device_and_context 12.01.22
+  hosts: test
+  gather_facts: no
+  connection: local
+
+  vars:
+    aci_login: &aci_login
+      hostname: '{{ ansible_host }}'
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") | default(ansible_user, true) }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") | default(ansible_password, true) }}'
+      validate_certs: no
+
+
+    HYDRA_VARIABLES:
+    - variable_name: tenant_name
+      type: ACI tenant query 0.14
+      display_name: Tenant Name
+      description: Choose a tenant.
+      required: true
+    - variable_name: service_graph
+      type: text
+      display_name: ServiceGraph
+      description: ServiceGraph
+      required: true
+    - variable_name: copy_device
+      type: text
+      display_name: Copy Device
+      description: Copy Device
+      required: true
+    - variable_name: vlan
+      type: integer
+      display_name: VLAN ID
+      description: Vlan ID
+      required: true
+    - variable_name: leaf
+      type: text
+      display_name: Leaf
+      description: Leaf
+      required: true
+    - variable_name: interface
+      type: text
+      display_name: Interface
+      description: Interface
+      required: true
+    - variable_name: copy_device
+      type: text
+      display_name: phys_domain
+      description: Physical Domain
+      required: true
+    - variable_name: vlan_pool
+      type: text
+      display_name: Vlan Pool
+      description: Enter Vlan Pool
+      required: true
+
+  tasks:
+  - name: Create new VLAN pool
+    aci_vlan_pool:
+      <<: *aci_login
+      pool: "{{ vlan_pool }}"
+      pool_allocation_mode: static
+      description: Production VLANs
+      state: present
+
+
+  - name: Bind VLAN to VLAN Pool
+    aci_vlan_pool_encap_block:
+      <<: *aci_login
+      pool: "{{ vlan_pool }}"
+      block_start: "{{ vlan }}"
+      block_end: "{{ vlan }}"
+      block_name: "{{ vlan_block_name }}"
+      pool_allocation_mode: static
+      state: present
+
+  - name: Create Physical Domain
+    aci_domain:
+      <<: *aci_login
+      domain: "{{ phys_domain }}"
+      domain_type: phys
+      state: present
+
+  - name: add copy-service graph and device and configuring "Device Selection Policies"
+    aci_rest:
+      <<: *aci_login
+      path: /api/node/mo/uni.json
+      method: post
+      content:
+        fvTenant:
+          attributes:
+            dn: uni/tn-{{ tenant_name }}
+            status: modified
+          children:
+          - vnsLDevVip:
+              attributes:
+                dn: uni/tn-{{ tenant_name }}/lDevVip-{{ copy_device }}
+                contextAware: single-Context
+                devtype: PHYSICAL
+                funcType: None
+                isCopy: 'yes'
+                managed: 'no'
+                mode: legacy-Mode
+                name: "{{ copy_device }}"
+                svcType: COPY
+                trunking: 'no'
+                rn: lDevVip-{{ copy_device }}
+                status: created
+              children:
+              - vnsRsALDevToPhysDomP:
+                  attributes:
+                    tDn: uni/phys-{{ phys_domain }}
+                    status: created
+              - vnsCDev:
+                  attributes:
+                    name: "{{ copy_device }}_Device_1"
+                  children:
+                  - vnsCIf:
+                      attributes:
+                        name: int1
+                      children:
+                      - vnsRsCIfPathAtt:
+                          attributes:
+                            tDn: topology/pod-1/paths-{{ leaf }}/pathep-[eth{{ interface }}]
+              - vnsLIf:
+                  attributes:
+                    encap: vlan-{{ vlan }}
+                    name: TAP
+                  children:
+                  - vnsRsCIfAttN:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/lDevVip-{{ copy_device }}/cDev-{{copy_device}}_Device_1/cIf-[int1]
+          - vnsAbsGraph:
+              attributes:
+                name: "{{ service_graph }}"
+                uiTemplateType: UNSPECIFIED
+              children:
+              - vnsAbsTermNodeCon:
+                  attributes:
+                    name: T1
+                  children:
+                  - vnsAbsTermConn:
+                      attributes:
+                        attNotify: 'no'
+                        name: '1'
+              - vnsAbsTermNodeProv:
+                  attributes:
+                    name: T2
+                  children:
+                  - vnsAbsTermConn:
+                      attributes:
+                        attNotify: 'no'
+                        name: '1'
+              - vnsAbsConnection:
+                  attributes:
+                    adjType: L2
+                    connDir: provider
+                    connType: external
+                    name: C1
+                    unicastRoute: 'yes'
+                  children:
+                  - vnsRsAbsConnectionConns:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/AbsGraph-{{ service_graph }}/AbsTermNodeCon-T1/AbsTConn
+                  - vnsRsAbsConnectionConns:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/AbsGraph-{{ service_graph }}/AbsTermNodeProv-T2/AbsTConn
+                  - vnsRsAbsCopyConnection:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/AbsGraph-{{ service_graph }}/AbsNode-CP1/AbsFConn-copy
+              - vnsAbsNode:
+                  attributes:
+                    funcTemplateType: OTHER
+                    funcType: None
+                    isCopy: 'yes'
+                    managed: 'no'
+                    name: CP1
+                    routingMode: unspecified
+                    sequenceNumber: '0'
+                    shareEncap: 'no'
+                  children:
+                  - vnsAbsFuncConn:
+                      attributes:
+                        attNotify: 'no'
+                        name: copy
+                  - vnsRsNodeToLDev:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/lDevVip-{{ copy_device }}
+          - vnsLDevCtx:
+              attributes:
+                ctrctNameOrLbl: any
+                graphNameOrLbl: "{{ service_graph }}"
+                nodeNameOrLbl: CP1
+              children:
+              - vnsRsLDevCtxToLDev:
+                  attributes:
+                    tDn: uni/tn-{{ tenant_name }}/lDevVip-{{ copy_device }}
+              - vnsLIfCtx:
+                  attributes:
+                    connNameOrLbl: copy
+                  children:
+                  - vnsRsLIfCtxToLIf:
+                      attributes:
+                        tDn: uni/tn-{{ tenant_name }}/lDevVip-{{ copy_device }}/lIf-TAP
