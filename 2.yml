@@ -1,0 +1,30 @@
+---
+
+- name: bind filter to subject of contract
+  hosts: test
+  gather_facts: no
+  connection: local
+
+  vars:
+    aci_login: &aci_login
+      hostname: '{{ ansible_host }}'
+      username: '{{ lookup("env", "ANSIBLE_NET_USERNAME") | default(ansible_user, true) }}'
+      password: '{{ lookup("env", "ANSIBLE_NET_PASSWORD") | default(ansible_password, true) }}'
+      validate_certs: no
+
+  tasks:
+  - name: Add a new filter to a tenant
+    aci_filter:
+      <<: *aci_login
+      tenant: "{{ tenant_name }}"
+      filter: '{{ filter_name }}'
+      state: present
+
+  - name: Bind filter to subject of contract
+    aci_contract_subject_to_filter:
+      <<: *aci_login
+      tenant: "{{ tenant_name }}"
+      contract: "{{ contract_name }}"
+      subject: "{{ subject_name }}"
+      filter: '{{ filter_name }}'
+      state: present
